@@ -1,0 +1,61 @@
+---
+- hosts: pulp3
+  remote_user: root
+  gather_facts: no
+  vars_files:
+    - ../../conf/pulpperf.yaml
+  vars:
+    ansible_pulp_checkout: ../../tmp/ansible-pulp/
+  roles:
+  tasks:
+    - name: "Clone ansible-pulp git"
+      git:
+        repo: "https://github.com/pulp/ansible-pulp.git"
+        dest: "{{ ansible_pulp_checkout }}"
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Install ansible-galaxy requirements"
+      command:
+        ansible-galaxy install -p "{{ ansible_pulp_checkout }}/roles" -r requirements.yml
+      args:
+        chdir: "{{ ansible_pulp_checkout }}"
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Prepare inventory"
+      lineinfile:
+        path: "{{ ansible_pulp_checkout }}/inventory.ini"
+        line: "{{ item }}"
+        state: present
+        create: yes
+      loop: "{{ groups['pulp3'] }}"
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Create ansible.cfg"
+      copy:
+        dest: "{{ ansible_pulp_checkout }}/ansible.cfg"
+        content: |
+            [defaults]
+            host_key_checking = False
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Copy ssh key to reach puppet machine"
+      copy:
+        dest: "{{ ansible_pulp_checkout }}/id_rsa"
+        src: "../../{{ pulpperf_private_key }}"
+        mode: "0600"
+      delegate_to: localhost
+      run_once: yes
+
+    - name: "Run ansible-pulp playbook"
+      command:
+        ansible-playbook example-use/playbook.yml -i inventory.ini -u root --private-key=id_rsa
+      args:
+        chdir: "{{ ansible_pulp_checkout }}"
+      environment:
+        ANSIBLE_ROLES_PATH: "{{ ansible_pulp_checkout }}/roles"
+      delegate_to: localhost
+      run_once: yes

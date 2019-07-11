@@ -1,0 +1,3 @@
+---
+pulpperf_private_key: conf/id_rsa_perf
+pulpperf_public_key: conf/id_rsa_perf.pub
