@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source lib.sh
+source ./lib.sh
 
 REPO_PATH="$1"   # Path to the repository to sync
 if [ -n "$REPO_PATH" ]; then

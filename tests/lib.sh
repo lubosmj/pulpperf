@@ -45,5 +45,5 @@ function fatal() {
 export BASE_ADDR=http://localhost:24817
 export CONTENT_ADDR=http://localhost:24816
 
-rpm -q jq || fatal "jq package missing"
-rpm -q python2-httpie || fatal "python2-httpie package missing"
+rpm --quiet -q jq || fatal "jq package missing"
+rpm --quiet -q python2-httpie || fatal "python2-httpie package missing"
