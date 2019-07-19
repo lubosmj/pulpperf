@@ -17,6 +17,9 @@ def main():
                            help='number of files in the repo')
     rp_parser.add_argument('--file-size', default=50, type=int,
                            help='size of files in repository in bytes')
+    rp_parser.add_argument('--file-prefix', default='a',
+                           help='file prefix used for both name and content so'
+                                ' you have different files in similar repos')
     rp_parser.add_argument('--directory', default='/tmp/aaa',
                            help='repo directory path')
     rp_parser.add_argument('--debug', action='store_true',
@@ -35,7 +38,8 @@ def main():
     logging.info('Generating %s files with size %s into %s'
                  % (args.files_count, args.file_size, args.directory))
     for i in range(args.files_count):
-        pulp_manifest.append(create_file(args.directory, i, args.file_size))
+        pulp_manifest.append(create_file(args.directory, i, args.file_prefix,
+                                         args.file_size))
 
     logging.info('Saving PULP_MANIFEST into %s' % args.directory)
     dump_manifest(args.directory, pulp_manifest)
@@ -43,13 +47,16 @@ def main():
     logging.info('Finished creating repo in %s' % args.directory)
 
 
-def create_file(directory, file_id, file_size, file_suffix='.iso'):
+def create_file(directory, file_id, file_prefix, file_size,
+                file_suffix='.iso'):
     """Create file with defined size and return info needed for
     PULP_MANIFEST"""
 
-    file_name = str(file_id) + file_suffix
+    file_name = file_prefix + str(file_id) + file_suffix
     file_path = os.path.join(directory, file_name)
-    file_content = str(file_id).zfill(file_size).encode()
+    file_content = file_prefix + str(file_id).zfill(
+        file_size - len(file_prefix))
+    file_content = file_content.encode()
 
     assert len(file_content) == file_size
 
