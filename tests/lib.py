@@ -2,7 +2,6 @@ import logging
 import requests
 import random
 import string
-import urllib.parse
 
 
 BASE_ADDR = "http://localhost:24817"

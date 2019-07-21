@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
 
-import logging
 import argparse
 import sys
-
-from pprint import pprint
 
 import lib
 
 
-
 def create_repo(name):
-    """"""
+    """Create repository"""
     return lib.post('/pulp/api/v3/repositories/',
                     data={'name': name})['_href']
 
 
 def create_remote(name, url):
-    """"""
+    """Create remote"""
     return lib.post('/pulp/api/v3/remotes/file/file/',
                     data={'name': name, 'url': url+'PULP_MANIFEST'})['_href']
 
+
 def start_sync(repo, remote):
-    """"""
+    """Start sync of the remote into the repository, return task"""
     return lib.post(remote+'sync/',
                     data={'repository': repo, 'mirror': False})
 
@@ -45,12 +42,10 @@ def main():
     tasks = []
     for repo, remote in repo_remote:
         task = start_sync(repo, remote)
-        pprint(task)
         tasks.append(task)
 
-    print(tasks)
-
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
