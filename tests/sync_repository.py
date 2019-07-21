@@ -23,6 +23,8 @@ def create_remote(name, url):
 
 def start_sync(repo, remote):
     """"""
+    return lib.post(remote+'/sync/',
+                    data={'repository': repo, 'mirror': False})
 
 
 def main():
@@ -38,13 +40,12 @@ def main():
     for r in args.repositories:
         repo = create_repo(lib.get_random_string())
         remote = create_remote(lib.get_random_string(), r)
-        pprint(repo)
-        pprint(remote)
         repo_remote.append((repo, remote))
 
     tasks = []
     for repo, remote in repo_remote:
         task = start_sync(repo, remote)
+        pprint(task)
         tasks.append(task)
 
     print(tasks)
