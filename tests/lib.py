@@ -2,6 +2,7 @@ import logging
 import requests
 import random
 import string
+import urllib.parse
 
 
 BASE_ADDR = "http://localhost:24817"
@@ -38,4 +39,8 @@ def get():
 
 def post(url, data):
     """Wrapper around requests.post with some simplification in our case"""
-    return requests.post(url=BASE_ADDR+url, data=data).json()
+    url = BASE_ADDR + url
+
+    r = requests.post(url=url, data=data)
+    r.raise_for_status()
+    return r.json()

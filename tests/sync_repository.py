@@ -23,7 +23,7 @@ def create_remote(name, url):
 
 def start_sync(repo, remote):
     """"""
-    return lib.post(remote+'/sync/',
+    return lib.post(remote+'sync/',
                     data={'repository': repo, 'mirror': False})
 
 
