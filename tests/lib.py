@@ -2,6 +2,7 @@ import logging
 import requests
 import random
 import string
+import time
 
 
 BASE_ADDR = "http://localhost:24817"
@@ -31,9 +32,14 @@ def get_random_string():
     return ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 
 
-def get():
+def get(url):
     """Wrapper around requests.get with some simplification in our case"""
-    pass
+    url = BASE_ADDR + url
+
+    r = requests.get(url=url)
+    r.raise_for_status()
+    return r.json()
+
 
 
 def post(url, data):
@@ -43,3 +49,25 @@ def post(url, data):
     r = requests.post(url=url, data=data)
     r.raise_for_status()
     return r.json()
+
+
+def wait_for_tasks(tasks):
+    """Wait for tasks to finish, returning task info. If we time out,
+    list of None is returned."""
+    start = time.time()
+    out = []
+    timeout = 60
+    step = 3
+    for t in tasks:
+        while True:
+            now = time.time()
+            if now >= start + timeout:
+                out.append(None)
+                break
+            response = lib.get(t)
+            if response['state'] in ('failed', 'cancelled', 'completed'):
+                out.append(response)
+                break
+            else:
+                time.sleep(step)
+    return out

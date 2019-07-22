@@ -21,7 +21,7 @@ def create_remote(name, url):
 def start_sync(repo, remote):
     """Start sync of the remote into the repository, return task"""
     return lib.post(remote+'sync/',
-                    data={'repository': repo, 'mirror': False})
+                    data={'repository': repo, 'mirror': False})['task']
 
 
 def main():
@@ -43,6 +43,8 @@ def main():
     for repo, remote in repo_remote:
         task = start_sync(repo, remote)
         tasks.append(task)
+
+    results = wait_for_tasks(tasks)
 
     return 0
 
