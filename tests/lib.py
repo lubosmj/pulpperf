@@ -68,7 +68,7 @@ def wait_for_tasks(tasks):
             if now >= start + timeout:
                 out.append(None)
                 break
-            response = lib.get(t)
+            response = get(t)
             if response['state'] in ('failed', 'cancelled', 'completed'):
                 out.append(response)
                 break
