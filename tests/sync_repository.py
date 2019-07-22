@@ -44,7 +44,11 @@ def main():
         task = start_sync(repo, remote)
         tasks.append(task)
 
-    results = wait_for_tasks(tasks)
+    results = lib.wait_for_tasks(tasks)
+    print(lib.tasks_table(results))
+    print("Tasks created:", lib.date_spread_analysis(results, '_created'))
+    print("Tasks started:", lib.date_spread_analysis(results, 'started_at'))
+    print("Tasks finished:", lib.date_spread_analysis(results, 'finished_at'))
 
     return 0
 

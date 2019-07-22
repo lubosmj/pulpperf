@@ -3,10 +3,14 @@ import requests
 import random
 import string
 import time
+import datetime
+import statistics
 
 
 BASE_ADDR = "http://localhost:24817"
 CONTENT_ADDR = "http://localhost:24816"
+
+DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 def add_common_params_and_parse(parser):
@@ -71,3 +75,25 @@ def wait_for_tasks(tasks):
             else:
                 time.sleep(step)
     return out
+
+
+def tasks_table(tasks):
+    """Return overview of tasks in the table"""
+    out = []
+    for t in tasks:
+        out.append([t['_href'], t['_created'], t['state'], t['started_at'], t['finished_at']])
+    return out
+
+
+def date_spread_analysis(data, field):
+    """Count basic statistical measures for given datetime field in
+    the list of dicts"""
+    sample = []
+    for d in data:
+        sample.append(datetime.datetime.strptime(d[field], DATETIME_FMT))
+    return {
+        'min': min(sample),
+        'max': max(sample),
+        'spread': max(sample)-min(sample),
+        'stdev': statistics.stdev([i.timestamp() for i in sample]),
+    }
