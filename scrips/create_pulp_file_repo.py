@@ -3,7 +3,8 @@
 
 import logging
 import argparse
-import os.path
+import os
+import errno
 import csv
 import hashlib
 
@@ -59,6 +60,12 @@ def create_file(directory, file_id, file_prefix, file_size,
     file_content = file_content.encode()
 
     assert len(file_content) == file_size
+
+    try:
+        os.makedirs(os.path.dirname(file_path))
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
     logging.debug('Writing file %s' % file_path)
     with open(file_path, 'wb') as fp:
