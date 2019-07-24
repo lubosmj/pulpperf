@@ -59,7 +59,7 @@ def wait_for_tasks(tasks):
     list of None is returned."""
     start = time.time()
     out = []
-    timeout = 60
+    timeout = 7200
     step = 3
     for t in tasks:
         while True:
