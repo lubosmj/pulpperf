@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import argparse
 import sys
 
@@ -49,9 +50,8 @@ def main():
 
     results = lib.wait_for_tasks(tasks)
     print(lib.tasks_table(results))
-    print("Tasks created:", lib.date_spread_analysis(results, '_created'))
-    print("Tasks started:", lib.date_spread_analysis(results, 'started_at'))
-    print("Tasks finished:", lib.date_spread_analysis(results, 'finished_at'))
+    print("Sync tasks waiting time:", lib.tasks_waiting_time(results))
+    print("Sync tasks service time:", lib.tasks_service_time(results))
 
     return 0
 

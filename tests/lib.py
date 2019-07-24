@@ -45,7 +45,6 @@ def get(url):
     return r.json()
 
 
-
 def post(url, data):
     """Wrapper around requests.post with some simplification in our case"""
     url = BASE_ADDR + url
@@ -79,21 +78,38 @@ def wait_for_tasks(tasks):
 
 def tasks_table(tasks):
     """Return overview of tasks in the table"""
-    out = []
+    out = ""
     for t in tasks:
-        out.append([t['_href'], t['_created'], t['state'], t['started_at'], t['finished_at']])
+        out += "%s\t%s\t%s\t%s\t%s\n" \
+            % (t['_href'], t['_created'], t['started_at'], t['finished_at'],
+               t['state'])
     return out
 
 
-def date_spread_analysis(data, field):
-    """Count basic statistical measures for given datetime field in
-    the list of dicts"""
-    sample = []
-    for d in data:
-        sample.append(datetime.datetime.strptime(d[field], DATETIME_FMT))
+def data_stats(data):
     return {
-        'min': min(sample),
-        'max': max(sample),
-        'spread': max(sample)-min(sample),
-        'stdev': statistics.stdev([i.timestamp() for i in sample]),
+        'min': min(data),
+        'max': max(data),
+        'mean': statistics.mean(data),
+        'stdev': statistics.stdev(data),
     }
+
+
+def tasks_waiting_time(tasks):
+    """Analyse tasks waiting time (i.e. started_at - _created)"""
+    durations = []
+    for t in tasks:
+        diff = datetime.datetime.strptime(t['started_at'], DATETIME_FMT) \
+            - datetime.datetime.strptime(t['_created'], DATETIME_FMT)
+        durations.append(diff.total_seconds())
+    return data_stats(durations)
+
+
+def tasks_service_time(tasks):
+    """Analyse tasks service time (i.e. finished_at - started_at)"""
+    durations = []
+    for t in tasks:
+        diff = datetime.datetime.strptime(t['finished_at'], DATETIME_FMT) \
+            - datetime.datetime.strptime(t['started_at'], DATETIME_FMT)
+        durations.append(diff.total_seconds())
+    return data_stats(durations)
