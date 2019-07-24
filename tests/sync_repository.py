@@ -56,6 +56,7 @@ def main():
 
     results = lib.wait_for_tasks(tasks)
     print(lib.tasks_table(results))
+    print(lib.tasks_min_max_table(results))
     print("Sync tasks waiting time:", lib.tasks_waiting_time(results))
     print("Sync tasks service time:", lib.tasks_service_time(results))
 
@@ -67,6 +68,7 @@ def main():
 
     results = lib.wait_for_tasks(tasks)
     print(lib.tasks_table(results))
+    print(lib.tasks_min_max_table(results))
     print("Publication tasks waiting time:", lib.tasks_waiting_time(results))
     print("Publication tasks service time:", lib.tasks_service_time(results))
 

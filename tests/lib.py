@@ -87,6 +87,19 @@ def tasks_table(tasks):
     return out
 
 
+def tasks_min_max_table(tasks):
+    """Return overview of tasks dates min and max in a table"""
+    out = "\n%11s\t%27s\t%27s\n" % ('field', 'min', 'max')
+    for f in ('_created', 'started_at', 'finished_at'):
+        sample = [datetime.datetime.strptime(t[f], DATETIME_FMT)
+                  for t in tasks]
+        out += "%s\t%s\t%s\n" \
+            % (f,
+               min(sample).strftime(DATETIME_FMT),
+               max(sample).strftime(DATETIME_FMT))
+    return out
+
+
 def data_stats(data):
     return {
         'min': min(data),
