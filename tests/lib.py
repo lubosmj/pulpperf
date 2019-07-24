@@ -78,7 +78,8 @@ def wait_for_tasks(tasks):
 
 def tasks_table(tasks):
     """Return overview of tasks in the table"""
-    out = ""
+    out = "%56s\t%27s\t%27s\t%27s\t%s\n" \
+        % ('task', 'created', 'started', 'finished', 'state')
     for t in tasks:
         out += "%s\t%s\t%s\t%s\t%s\n" \
             % (t['_href'], t['_created'], t['started_at'], t['finished_at'],
