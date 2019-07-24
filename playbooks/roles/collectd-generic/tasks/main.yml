@@ -1,0 +1,43 @@
+---
+- name: "Install EPEL"
+  yum:
+    name: "{{ epel_release }}"
+    state: installed
+
+- name: "Install collectd rpms"
+  yum:
+    name: "{{ collectd_packages.config_type }}"
+    state: present
+
+- name: "Uninstall EPEL"
+  yum:
+    name: epel-release
+    state: absent
+
+###- name: "Get Pulp PostgresDB Password"
+###  command: grep "jpa.config.hibernate.connection.password" /etc/candlepin/candlepin.conf
+###  register: pulp_postgresql_password
+###  when: "'{{ config_type }}' == 'pulp3'"
+
+- name: "Configure collectd.conf"
+  template:
+    src: "{{ config_type }}.collectd.conf.j2"
+    dest: /etc/collectd.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Set permissive policy for collectd"
+  command: semanage permissive -a collectd_t
+  ignore_errors: true
+
+- name: "Add collectd group"
+  group:
+    name: collectd
+    state: present
+
+- name: "Setup collectd service"
+  service:
+    name: collectd
+    state: restarted
+    enabled: true

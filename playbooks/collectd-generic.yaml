@@ -1,0 +1,9 @@
+---
+- hosts: pulp3
+  remote_user: root
+  vars:
+    config_type: pulp3
+  vars_files:
+    - ../conf/pulpperf.yaml
+  roles:
+    - collectd-generic

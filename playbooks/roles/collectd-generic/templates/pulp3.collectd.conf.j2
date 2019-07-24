@@ -1,0 +1,119 @@
+# Installed by Satellite Ansible Installer
+# Config type: {{config_type}}
+
+# Interval default is 10s
+Interval {{ collectd_interval|default('10') }}
+
+# Hostname for this machine, if not defined, use gethostname(2) system call
+Hostname "{{ inventory_hostname }}"
+
+# Allow collectd to log
+LoadPlugin syslog
+
+# Loaded Plugins:
+LoadPlugin write_graphite
+LoadPlugin cpu
+LoadPlugin df
+LoadPlugin disk
+LoadPlugin interface
+LoadPlugin irq
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin network
+LoadPlugin numa
+LoadPlugin processes
+LoadPlugin postgresql
+LoadPlugin statsd
+LoadPlugin swap
+LoadPlugin turbostat
+LoadPlugin unixsock
+LoadPlugin uptime
+
+# Open unix domain socket for collectdctl
+<Plugin unixsock>
+  SocketFile "/var/run/collectd-unixsock"
+  SocketGroup "collectd"
+  SocketPerms "0770"
+  DeleteSocket true
+</Plugin>
+
+{% if collectd_network_interface is defined %}
+#Configure the network interface to use
+<Plugin interface>
+  Interface "{{ collectd_network_interface }}"
+  IgnoreSelected false
+</Plugin>
+{% endif %}
+
+{% if collectd_remote_server is defined %}
+#Configure where should collectd send its data
+<Plugin network>
+  Server "{{ collectd_remote_server }}" "{{ collectd_remote_port }}"
+</Plugin>
+{% endif %}
+
+# Setup statsd
+<Plugin statsd>
+  Host "0.0.0.0"
+  Port "8125"
+  DeleteSets true
+</Plugin>
+
+# Graphite Host Configuration
+<Plugin write_graphite>
+  <Carbon>
+    Host "{{ carbon_host }}"
+    Port "{{ carbon_port }}"
+    Prefix "{{ graphite_prefix }}."
+    Protocol "tcp"
+    LogSendErrors true
+    StoreRates true
+    AlwaysAppendDS false
+    EscapeCharacter "_"
+  </Carbon>
+</Plugin>
+
+<Plugin df>
+  ValuesPercentage true
+</Plugin>
+
+<Plugin disk>
+  Disk "/^[hsv]d[a-z]+[0-9]?$/"
+  IgnoreSelected false
+</Plugin>
+
+###<Plugin postgresql>
+###  <Database pulp>
+###    Host "localhost"
+###    Port "5432"
+###    User "postgres"
+###    Password "xxx"
+###    # Predefined:
+###    Query backends
+###    Query transactions
+###    Query queries
+###    Query table_states
+###    Query disk_io
+###    Query disk_usage
+###  </Database>
+###</Plugin>
+
+<Plugin processes>
+  ProcessMatch "rq workers" "/rq worker .*/pulp-worker-"
+  ProcessMatch "rq resource manager" "/rq worker .*/pulp-resource-manager/"
+  ProcessMatch "gunicorn" "gunicorn pulpcore.content:server"
+  ProcessMatch "postgres" "postgres.*"
+  ProcessMatch "redis-server" "redis-server"
+  ProcessMatch "nginx" "nginx"
+
+  # Collect on collectd process
+  ProcessMatch "collectd" "/usr/sbin/collectd.+-C.+/etc/collectd.conf"
+</Plugin>
+
+<Plugin swap>
+  ReportBytes true
+  ValuesPercentage true
+</Plugin>
+
+# Include other collectd configuration files
+Include "/etc/collectd.d"

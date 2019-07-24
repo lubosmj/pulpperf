@@ -1,0 +1,8 @@
+---
+collectd_packages:
+  pulp3:
+    - collectd
+    - collectd-turbostat
+    - collectd-postgresql
+
+epel_release: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
