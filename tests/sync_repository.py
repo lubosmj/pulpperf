@@ -36,12 +36,15 @@ def main():
     repo_remote = []
     for r in args.repositories:
         repo = create_repo(lib.get_random_string())
+        logging.debug("Created repository %s" % repo)
         remote = create_remote(lib.get_random_string(), r)
+        logging.debug("Created remote %s" % remote)
         repo_remote.append((repo, remote))
 
     tasks = []
     for repo, remote in repo_remote:
         task = start_sync(repo, remote)
+        logging.debug("Created sync task %s" % task)
         tasks.append(task)
 
     results = lib.wait_for_tasks(tasks)
