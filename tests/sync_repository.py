@@ -25,6 +25,12 @@ def start_sync(repo, remote):
                     data={'repository': repo, 'mirror': False})['task']
 
 
+def create_publication(repo):
+    """Start publication of the repository, return task"""
+    return lib.post('/pulp/api/v3/publications/file/file/',
+                    data={'repository': repo})['task']
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Sync file repositories in parallel",
@@ -52,6 +58,17 @@ def main():
     print(lib.tasks_table(results))
     print("Sync tasks waiting time:", lib.tasks_waiting_time(results))
     print("Sync tasks service time:", lib.tasks_service_time(results))
+
+    tasks = []
+    for repo, remote in repo_remote:
+        task = create_publication(repo)
+        logging.debug("Created publication task %s" % task)
+        tasks.append(task)
+
+    results = lib.wait_for_tasks(tasks)
+    print(lib.tasks_table(results))
+    print("Publication tasks waiting time:", lib.tasks_waiting_time(results))
+    print("Publication tasks service time:", lib.tasks_service_time(results))
 
     return 0
 
