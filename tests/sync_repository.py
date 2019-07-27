@@ -31,6 +31,12 @@ def create_publication(repo):
                     data={'repository': repo})['task']
 
 
+def create_distribution(name, base_path, pub):
+    """Start distribution of the repository version, return task"""
+    return lib.post('/pulp/api/v3/distributions/file/file/',
+                    data={'name': name, 'base_path': base_path, 'publication': pub})['task']
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Sync file repositories in parallel",
@@ -72,8 +78,31 @@ def main():
     print("Publication tasks waiting time:", lib.tasks_waiting_time(results))
     print("Publication tasks service time:", lib.tasks_service_time(results))
 
-    return 0
+    publications = []
+    for result in results:
+        pub = result['created_resources'][0]
+        publications.append(pub)
 
+    tasks = []
+    for pub in publications:
+        task = create_distribution(lib.get_random_string(), lib.get_random_string(), pub)
+        logging.debug("Created distribution task %s" % task)
+        tasks.append(task)
+
+    results = lib.wait_for_tasks(tasks)
+    print(lib.tasks_table(results))
+    print(lib.tasks_min_max_table(results))
+    print("Distribution tasks waiting time:", lib.tasks_waiting_time(results))
+    print("Distribution tasks service time:", lib.tasks_service_time(results))
+
+    distributions = []
+    dist_base_urls = []
+    for result in results:
+        distribution = result['created_resources'][0]
+        distributions.append(distribution)
+        dist_base_urls.append(lib.get(distribution)['base_url'])
+
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
