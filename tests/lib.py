@@ -102,10 +102,11 @@ def tasks_min_max_table(tasks):
 
 def data_stats(data):
     return {
+        'samples': len(data),
         'min': min(data),
         'max': max(data),
         'mean': statistics.mean(data),
-        'stdev': statistics.stdev(data),
+        'stdev': statistics.stdev(data) if len(data) > 1 else 0.0,
     }
 
 
