@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import logging
-import argparse
 import sys
-
 import lib
 
 def create_repo_version(repo,ver=None):
@@ -14,8 +11,15 @@ def get_repository_version(task):
 	"""getting the repo version from the task"""
 	return lib.get(task)
 
-repo1 = '/pulp/api/v3/repositories/fdf22817-cd92-4ed7-861b-26f40479c9cb/'
-repo2 = '/pulp/api/v3/repositories/595f15e1-1b2c-46b4-9ff8-ff2508a496a1/'
+def create_repo(name):
+	"""Create repository"""
+	return lib.post('/pulp/api/v3/repositories/',data={'name': name})
+
+repo1 = create_repo(lib.get_random_string())
+repo1 = repo1.get("_href")
+repo2 = create_repo(lib.get_random_string())
+repo2 = repo2.get("_href")
+
 repo_ver_a = create_repo_version(repo1)
 task = repo_ver_a.get("task")
 version_a = get_repository_version(task)
