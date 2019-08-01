@@ -54,6 +54,25 @@ def post(url, data):
     return r.json()
 
 
+def _urljoin(*args):
+    # This sucks, but works. Better ways welcome.
+    return '/'.join([i.lstrip('/').rstrip('/') for i in args])
+
+
+def download(base_url, file_name, file_size):
+    """Downlad file with expected size and drop it"""
+    import tempfile
+    import time
+    with tempfile.TemporaryFile() as downloaded_file:
+        before = time.clock()
+        response = requests.get(_urljoin(CONTENT_ADDR, base_url, file_name))
+        after = time.clock()
+        response.raise_for_status()
+        downloaded_file.write(response.content)
+        assert downloaded_file.tell() == file_size
+        return after - before
+
+
 def wait_for_tasks(tasks):
     """Wait for tasks to finish, returning task info. If we time out,
     list of None is returned."""
@@ -74,6 +93,13 @@ def wait_for_tasks(tasks):
             else:
                 time.sleep(step)
     return out
+
+
+def parse_pulp_manifest(url):
+    response = requests.get(url)
+    response.text.split("\n")
+    data = [i.strip().split(',') for i in response.text.split("\n")]
+    return [(i[0], i[1], int(i[2])) for i in data if i != ['']]
 
 
 def tasks_table(tasks):

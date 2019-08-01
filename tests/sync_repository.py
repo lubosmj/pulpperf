@@ -46,17 +46,22 @@ def main():
                         help='file repository(ies) to sync')
     args = lib.add_common_params_and_parse(parser)
 
-    repo_remote = []
+    data = []
     for r in args.repositories:
-        repo = create_repo(lib.get_random_string())
-        logging.debug("Created repository %s" % repo)
-        remote = create_remote(lib.get_random_string(), r)
-        logging.debug("Created remote %s" % remote)
-        repo_remote.append((repo, remote))
+        data.append({'remote_url': r})
+
+    repo_remote = []
+    for r in data:
+        r['repository_name'] = lib.get_random_string()
+        r['repository_href'] = create_repo(r['repository_name'])
+        logging.debug("Created repository %s" % r['repository_href'])
+        r['remote_name'] = lib.get_random_string()
+        r['remote_href'] = create_remote(r['remote_name'], r['remote_url'])
+        logging.debug("Created remote %s" % r['remote_href'])
 
     tasks = []
-    for repo, remote in repo_remote:
-        task = start_sync(repo, remote)
+    for r in data:
+        task = start_sync(r['repository_href'], r['remote_href'])
         logging.debug("Created sync task %s" % task)
         tasks.append(task)
 
@@ -67,8 +72,8 @@ def main():
     print("Sync tasks service time:", lib.tasks_service_time(results))
 
     tasks = []
-    for repo, remote in repo_remote:
-        task = create_publication(repo)
+    for r in data:
+        task = create_publication(r['repository_href'])
         logging.debug("Created publication task %s" % task)
         tasks.append(task)
 
@@ -78,14 +83,14 @@ def main():
     print("Publication tasks waiting time:", lib.tasks_waiting_time(results))
     print("Publication tasks service time:", lib.tasks_service_time(results))
 
-    publications = []
-    for result in results:
-        pub = result['created_resources'][0]
-        publications.append(pub)
+    for i in range(len(results)):
+        data[i]['publication_href'] = results[i]['created_resources'][0]
 
     tasks = []
-    for pub in publications:
-        task = create_distribution(lib.get_random_string(), lib.get_random_string(), pub)
+    for r in data:
+        r['distribution_name'] = lib.get_random_string()
+        r['distribution_base_path'] = lib.get_random_string()
+        task = create_distribution(r['distribution_name'], r['distribution_base_path'], r['publication_href'])
         logging.debug("Created distribution task %s" % task)
         tasks.append(task)
 
@@ -97,10 +102,16 @@ def main():
 
     distributions = []
     dist_base_urls = []
-    for result in results:
-        distribution = result['created_resources'][0]
-        distributions.append(distribution)
-        dist_base_urls.append(lib.get(distribution)['base_url'])
+    for i in range(len(results)):
+        data[i]['distribution_href'] = results[i]['created_resources'][0]
+        data[i]['download_base_url'] = lib.get(data[i]['distribution_href'])['base_url']
+
+    for r in data:
+        durations = []
+        for f, _, s in lib.parse_pulp_manifest(r['remote_url'] + 'PULP_MANIFEST'):
+            durations.append(lib.download(r['download_base_url'], f, s))
+        print("Download times for %s: %s" % (r['remote_url'], lib.data_stats(durations)))
+
 
     return 0
 
