@@ -7,6 +7,7 @@ import sys
 import pulpperf.interact
 import pulpperf.structure
 import pulpperf.utils
+import pulpperf.reporting
 
 
 def list_units_in_repo_ver(repo_ver):
@@ -25,7 +26,7 @@ def main():
         description="Create publication and distribution on repositories",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    with pulpperf.reporting.status_data(parser) as (args, data):
+    with pulpperf.structure.status_data(parser) as (args, data):
 
         durations_list = []
         for r in data:
@@ -38,7 +39,7 @@ def main():
                 url = c.get("_href")
                 duration, content = pulpperf.utils.measureit(inspect_content, url)
                 durations_content.append(duration)
-            print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.data_stats(durations_list)))
+            print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.data_stats(durations_content)))
 
         print("Repo version content listing duration: %s" % pulpperf.reporting.data_stats(durations_list))
 

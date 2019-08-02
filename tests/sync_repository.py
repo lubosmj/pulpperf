@@ -7,6 +7,7 @@ import sys
 import pulpperf.interact
 import pulpperf.structure
 import pulpperf.utils
+import pulpperf.reporting
 
 
 def create_repo(name):
@@ -53,7 +54,7 @@ def main():
             logging.debug("Created sync task %s" % task)
             tasks.append(task)
 
-        results = pulpperf.utils.wait_for_tasks(tasks)
+        results = pulpperf.interact.wait_for_tasks(tasks)
         print(pulpperf.reporting.tasks_table(results))
         print(pulpperf.reporting.tasks_min_max_table(results))
         print("Sync tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))

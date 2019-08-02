@@ -1,8 +1,8 @@
 import requests
 import tempfile
+import time
 
-from utils import measureit
-from utils import urljoin
+from .utils import measureit, urljoin
 
 BASE_ADDR = "http://localhost:24817"
 CONTENT_ADDR = "http://localhost:24816"
@@ -15,7 +15,11 @@ def get(url, params={}):
 
     r = requests.get(url=url, params=params)
     r.raise_for_status()
-    return r.json()
+    data = r.json()
+    if 'results' in data:
+        return data['results']
+    else:
+        return data
 
 
 def post(url, data):
@@ -36,3 +40,25 @@ def download(base_url, file_name, file_size):
         downloaded_file.write(response.content)
         assert downloaded_file.tell() == file_size
         return duration
+
+
+def wait_for_tasks(tasks):
+    """Wait for tasks to finish, returning task info. If we time out,
+    list of None is returned."""
+    start = time.time()
+    out = []
+    timeout = 7200
+    step = 3
+    for t in tasks:
+        while True:
+            now = time.time()
+            if now >= start + timeout:
+                out.append(None)
+                break
+            response = get(t)
+            if response['state'] in ('failed', 'cancelled', 'completed'):
+                out.append(response)
+                break
+            else:
+                time.sleep(step)
+    return out

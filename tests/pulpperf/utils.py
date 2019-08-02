@@ -4,8 +4,6 @@ import time
 import string
 import requests
 
-from interact import get
-
 
 def get_random_string():
     """Return random string"""
@@ -23,28 +21,6 @@ def measureit(func, *args, **kwargs):
     out = func(*args, **kwargs)
     after = time.clock()
     return after - before, out
-
-
-def wait_for_tasks(tasks):
-    """Wait for tasks to finish, returning task info. If we time out,
-    list of None is returned."""
-    start = time.time()
-    out = []
-    timeout = 7200
-    step = 3
-    for t in tasks:
-        while True:
-            now = time.time()
-            if now >= start + timeout:
-                out.append(None)
-                break
-            response = get(t)
-            if response['state'] in ('failed', 'cancelled', 'completed'):
-                out.append(response)
-                break
-            else:
-                time.sleep(step)
-    return out
 
 
 def parse_pulp_manifest(url):

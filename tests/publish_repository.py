@@ -7,6 +7,7 @@ import sys
 import pulpperf.interact
 import pulpperf.structure
 import pulpperf.utils
+import pulpperf.reporting
 
 
 def create_publication(repo):
@@ -26,7 +27,7 @@ def main():
         description="Create publication and distribution on repositories",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    with pulpperf.reporting.status_data(parser) as (args, data):
+    with pulpperf.structure.status_data(parser) as (args, data):
 
         tasks = []
         for r in data:
@@ -34,7 +35,7 @@ def main():
             logging.debug("Created publication task %s" % task)
             tasks.append(task)
 
-        results = pulpperf.utils.wait_for_tasks(tasks)
+        results = pulpperf.interact.wait_for_tasks(tasks)
         print(pulpperf.reporting.tasks_table(results))
         print(pulpperf.reporting.tasks_min_max_table(results))
         print("Publication tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))
@@ -42,6 +43,7 @@ def main():
 
         for i in range(len(results)):
             data[i]['publication_href'] = results[i]['created_resources'][0]
+            data[i]['repository_version_href'] = pulpperf.interact.get(data[i]['publication_href'])['repository_version']
 
         tasks = []
         for r in data:
@@ -51,7 +53,7 @@ def main():
             logging.debug("Created distribution task %s" % task)
             tasks.append(task)
 
-        results = pulpperf.utils.wait_for_tasks(tasks)
+        results = pulpperf.interact.wait_for_tasks(tasks)
         print(pulpperf.reporting.tasks_table(results))
         print(pulpperf.reporting.tasks_min_max_table(results))
         print("Distribution tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))

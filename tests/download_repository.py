@@ -8,6 +8,7 @@ import multiprocessing
 import pulpperf.interact
 import pulpperf.structure
 import pulpperf.utils
+import pulpperf.reporting
 
 
 def main():
@@ -17,7 +18,7 @@ def main():
     )
     parser.add_argument('--processes', type=int, default=1,
                         help='how many parallel processes to use when downloading')
-    with pulpperf.reporting.status_data(parser) as (args, data):
+    with pulpperf.structure.status_data(parser) as (args, data):
 
         for r in data:
             params = []
