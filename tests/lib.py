@@ -6,6 +6,7 @@ import time
 import datetime
 import statistics
 import json
+import tempfile
 from contextlib import contextmanager
 
 
@@ -60,11 +61,12 @@ def get_random_string():
     return ''.join(random.choice(string.ascii_lowercase) for i in range(5))
 
 
-def get(url):
+def get(url, params={}):
     """Wrapper around requests.get with some simplification in our case"""
+    # TODO: pagination and results
     url = BASE_ADDR + url
 
-    r = requests.get(url=url)
+    r = requests.get(url=url, params=params)
     r.raise_for_status()
     return r.json()
 
@@ -83,18 +85,23 @@ def _urljoin(*args):
     return '/'.join([i.lstrip('/').rstrip('/') for i in args])
 
 
+def measureit(func, *args, **kwargs):
+    logging.debug("Measuring duration of %s %s %s" % (func.__name__, args, kwargs))
+    before = time.clock()
+    out = func(*args, **kwargs)
+    after = time.clock()
+    return after - before, out
+
+
 def download(base_url, file_name, file_size):
     """Downlad file with expected size and drop it"""
-    import tempfile
-    import time
     with tempfile.TemporaryFile() as downloaded_file:
-        before = time.clock()
-        response = requests.get(_urljoin(CONTENT_ADDR, base_url, file_name))
-        after = time.clock()
+        full_url = _urljoin(CONTENT_ADDR, base_url, file_name)
+        duration, response = measureit(requests.get, full_url)
         response.raise_for_status()
         downloaded_file.write(response.content)
         assert downloaded_file.tell() == file_size
-        return after - before
+        return duration
 
 
 def wait_for_tasks(tasks):
