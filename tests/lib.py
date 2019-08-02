@@ -51,8 +51,8 @@ def status_data(parser):
         yield args, data
     finally:
         # Save final status data
-    	with open(args.status, 'w+') as fp:
-        	json.dump(data, fp, sort_keys=True, indent=4)
+        with open(args.status, 'w+') as fp:
+            json.dump(data, fp, sort_keys=True, indent=4)
 
 
 def get_random_string():
