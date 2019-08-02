@@ -2,6 +2,7 @@
 
 import logging
 import argparse
+import sys
 
 import pulpperf.interact
 import pulpperf.structure
@@ -12,7 +13,7 @@ import pulpperf.reporting
 def create_repo_version(repo, ver):
     """Create repository version based on different existing version"""
     return pulpperf.interact.post(repo + 'versions/',
-                                  data={'base_version': ver})['_href']
+                                  data={'base_version': ver})['task']
 
 
 def create_repo(name):
@@ -30,7 +31,7 @@ def main():
 
         for r in data:
             r['repository_clone_name'] = pulpperf.utils.get_random_string()
-            r['repository_clone_href'] = create_repo(r['repository_name'])
+            r['repository_clone_href'] = create_repo(r['repository_clone_name'])
             logging.debug("For repo %s created repository clone %s" % (r['repository_href'], r['repository_clone_href']))
 
         tasks = []
@@ -44,3 +45,7 @@ def main():
         print(pulpperf.reporting.tasks_min_max_table(results))
         print("Version clone tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))
         print("Version clone tasks service time:", pulpperf.reporting.tasks_service_time(results))
+
+
+if __name__ == '__main__':
+    sys.exit(main())
