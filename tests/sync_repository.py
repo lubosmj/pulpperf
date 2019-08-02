@@ -3,6 +3,7 @@
 import logging
 import argparse
 import sys
+import multiprocessing
 
 import lib
 
@@ -106,9 +107,11 @@ def main():
             data[i]['download_base_url'] = lib.get(data[i]['distribution_href'])['base_url']
 
         for r in data:
-            durations = []
+            params = []
             for f, _, s in lib.parse_pulp_manifest(r['remote_url'] + 'PULP_MANIFEST'):
-                durations.append(lib.download(r['download_base_url'], f, s))
+                params.append((r['download_base_url'], f, s))
+            with multiprocessing.Pool(processes=4) as pool:
+                durations = pool.starmap(lib.download, params)
             print("Download times for %s: %s" % (r['remote_url'], lib.data_stats(durations)))
 
 
