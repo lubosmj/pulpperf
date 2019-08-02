@@ -4,16 +4,16 @@ import sys
 import lib
 
 def create_repo_version(repo,ver=None):
-	"""creating repository version"""
-	return lib.post(repo+'versions/',data={'base_version': ver})
+    """creating repository version"""
+    return lib.post(repo+'versions/',data={'base_version': ver})
 
 def get_repository_version(task):
-	"""getting the repo version from the task"""
-	return lib.get(task)
+    """getting the repo version from the task"""
+    return lib.get(task)
 
 def create_repo(name):
-	"""Create repository"""
-	return lib.post('/pulp/api/v3/repositories/',data={'name': name})
+    """Create repository"""
+    return lib.post('/pulp/api/v3/repositories/',data={'name': name})
 
 repo1 = create_repo(lib.get_random_string())
 repo1 = repo1.get("_href")
