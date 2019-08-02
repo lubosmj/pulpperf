@@ -5,7 +5,9 @@ import argparse
 import sys
 import multiprocessing
 
-import lib
+import pulpperf.interact
+import pulpperf.structure
+import pulpperf.utils
 
 
 def main():
@@ -15,18 +17,18 @@ def main():
     )
     parser.add_argument('--processes', type=int, default=1,
                         help='how many parallel processes to use when downloading')
-    with lib.status_data(parser) as (args, data):
+    with pulpperf.reporting.status_data(parser) as (args, data):
 
         for r in data:
             params = []
-            pulp_manifest = lib.parse_pulp_manifest(r['remote_url'] + 'PULP_MANIFEST')
+            pulp_manifest = pulpperf.utils.parse_pulp_manifest(r['remote_url'] + 'PULP_MANIFEST')
             logging.debug("Pulp manifest for %s have %d files" % (r['remote_url'], len(pulp_manifest)))
             for f, _, s in pulp_manifest:
                 params.append((r['download_base_url'], f, s))
             logging.debug("Going to use %d processes to download files" % args.processes)
             with multiprocessing.Pool(processes=args.processes) as pool:
-                durations = pool.starmap(lib.download, params)
-            print("Download times for %s: %s" % (r['remote_url'], lib.data_stats(durations)))
+                durations = pool.starmap(pulpperf.interact.download, params)
+            print("Download times for %s: %s" % (r['remote_url'], pulpperf.reporting.data_stats(durations)))
 
     return 0
 
