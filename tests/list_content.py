@@ -3,6 +3,7 @@
 import logging
 import argparse
 import sys
+import multiprocessing
 
 import pulpperf.interact
 import pulpperf.structure
@@ -23,9 +24,13 @@ def inspect_content(href):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create publication and distribution on repositories",
+        description="List content of repo version and inspect individual units",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    parser.add_argument('--limit', type=int, default=100,
+                        help='limit number of inspected units (per repository)')
+    parser.add_argument('--processes', type=int, default=1,
+                        help='how many parallel processes to use when inspecting')
     with pulpperf.structure.status_data(parser) as (args, data):
 
         durations_list = []
@@ -34,11 +39,13 @@ def main():
             logging.debug("Repo version %s have %d content units" % (r['repository_version_href'], len(content)))
             durations_list.append(duration)
 
-            durations_content = []
-            for c in content:
+            params = []
+            for c in content[:args.limit]:
                 url = c.get("_href")
-                duration, content = pulpperf.utils.measureit(inspect_content, url)
-                durations_content.append(duration)
+                params.append((inspect_content, url))
+            with multiprocessing.Pool(processes=args.processes) as pool:
+                output = pool.starmap(pulpperf.utils.measureit, params)
+            durations_content = [i[0] for i in output]
             print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.data_stats(durations_content)))
 
         print("Repo version content listing duration: %s" % pulpperf.reporting.data_stats(durations_list))
