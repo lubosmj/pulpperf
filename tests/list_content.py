@@ -3,6 +3,7 @@
 import logging
 import argparse
 import sys
+import datetime
 import multiprocessing
 
 import pulpperf.interact
@@ -33,6 +34,8 @@ def main():
                         help='how many parallel processes to use when inspecting')
     with pulpperf.structure.status_data(parser) as (args, data):
 
+        before = datetime.datetime.utcnow()
+
         durations_list = []
         for r in data:
             duration, content = pulpperf.utils.measureit(list_units_in_repo_ver, r['repository_version_href'])
@@ -48,7 +51,9 @@ def main():
             durations_content = [i[0] for i in output]
             print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.data_stats(durations_content)))
 
+        after = datetime.datetime.utcnow()
         print("Repo version content listing duration: %s" % pulpperf.reporting.data_stats(durations_list))
+        print(pulpperf.reporting.fmt_start_end_date("Experiment start - end time", before, after))
 
     return 0
 

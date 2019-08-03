@@ -56,3 +56,7 @@ def tasks_service_time(tasks):
             - datetime.datetime.strptime(t['started_at'], DATETIME_FMT)
         durations.append(diff.total_seconds())
     return data_stats(durations)
+
+
+def fmt_start_end_date(label, start, end):
+    return "%s: %s - %s" % (label, start.strftime(DATETIME_FMT), end.strftime(DATETIME_FMT))
