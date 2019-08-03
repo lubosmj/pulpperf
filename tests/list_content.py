@@ -53,7 +53,7 @@ def main():
 
         after = datetime.datetime.utcnow()
         print("Repo version content listing duration: %s" % pulpperf.reporting.data_stats(durations_list))
-        print(pulpperf.reporting.fmt_start_end_date("Experiment start - end time", before, after))
+        print(pulpperf.reporting.fmt_start_end_date("Content inspection experiment start - end time", before, after))
 
     return 0
 
