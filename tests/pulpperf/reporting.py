@@ -5,14 +5,16 @@ DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 def tasks_table(tasks):
-    """Return overview of tasks in the table"""
-    out = "%56s\t%27s\t%27s\t%27s\t%s\n" \
-        % ('task', 'created', 'started', 'finished', 'state')
+    """Return overview of tasks"""
+    out = []
     for t in tasks:
-        out += "%s\t%s\t%s\t%s\t%s\n" \
-            % (t['_href'], t['_created'], t['started_at'], t['finished_at'],
-               t['state'])
-    return out
+        out.append(t['_href'])
+        out.append("    name:\t%s" % t['name'])
+        out.append("    created:\t%s" % t['_created'])
+        out.append("    started:\t%s" % t['started_at'])
+        out.append("    finished:\t%s" % t['finished_at'])
+        out.append("    state:\t%s" % t['state'])
+    return "\n".join(out)
 
 
 def tasks_min_max_table(tasks):
