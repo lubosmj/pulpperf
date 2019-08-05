@@ -14,7 +14,7 @@ import pulpperf.reporting
 
 def list_units_in_repo_ver(repo_ver):
     """List the file content with all the fields"""
-    return pulpperf.interact.get('/pulp/api/v3/content/file/files/',
+    return pulpperf.interact.get_results('/pulp/api/v3/content/file/files/',
                                  params={'repository_version': repo_ver})
 
 
@@ -49,10 +49,10 @@ def main():
             with multiprocessing.Pool(processes=args.processes) as pool:
                 output = pool.starmap(pulpperf.utils.measureit, params)
             durations_content = [i[0] for i in output]
-            print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.data_stats(durations_content)))
+            print("Content inspection duration in %s: %s" % (r['repository_version_href'], pulpperf.reporting.fmt_data_stats(pulpperf.reporting.data_stats(durations_content))))
 
         after = datetime.datetime.utcnow()
-        print("Repo version content listing duration: %s" % pulpperf.reporting.data_stats(durations_list))
+        print("Repo version content listing duration: %s" % pulpperf.reporting.fmt_data_stats(pulpperf.reporting.data_stats(durations_list)))
         print(pulpperf.reporting.fmt_start_end_date("Content inspection experiment start - end time", before, after))
 
     return 0

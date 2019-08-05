@@ -34,7 +34,7 @@ def main():
             logging.debug("Going to use %d processes to download files" % args.processes)
             with multiprocessing.Pool(processes=args.processes) as pool:
                 durations = pool.starmap(pulpperf.interact.download, params)
-            print("Download times for %s: %s" % (r['remote_url'], pulpperf.reporting.data_stats(durations)))
+            print("Download times for %s: %s" % (r['remote_url'], pulpperf.reporting.fmt_data_stats(pulpperf.reporting.data_stats(durations))))
 
         after = datetime.datetime.utcnow()
         print(pulpperf.reporting.fmt_start_end_date("Experiment start - end time", before, after))

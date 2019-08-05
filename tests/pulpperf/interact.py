@@ -10,16 +10,24 @@ CONTENT_ADDR = "http://localhost:24816"
 
 def get(url, params={}):
     """Wrapper around requests.get with some simplification in our case"""
-    # TODO: pagination and results
     url = BASE_ADDR + url
 
     r = requests.get(url=url, params=params)
     r.raise_for_status()
     data = r.json()
-    if 'results' in data:
-        return data['results']
-    else:
-        return data
+    return data
+
+
+def get_results(url, params={}):
+    """Wrapper around requests.get with some simplification in our case"""
+    out = []
+    while True:
+        data = get(url, params)
+        out += data['results']
+        url = data['next']
+        if data['next'] is None:
+            break
+    return out
 
 
 def post(url, data):
