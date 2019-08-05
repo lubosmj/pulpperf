@@ -18,6 +18,7 @@ Measure:
     cd tests/
     rm -f status-data.json
     ./sync_repository.py http://repos.example.com/pub/pulpperf/file-10k-10B-B/ http://repos.example.com/pub/pulpperf/file-10k-10B-C/ http://repos.example.com/pub/pulpperf/file-10k-10B-D/   # create and sync repo
+    ./resync_repository.py   # resync repository
     ./publish_repository.py   # create publication and distribution
     ./download_repository.py   # download all units from repository
     ./list_content.py   # list and inspect repository content
