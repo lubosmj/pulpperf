@@ -36,7 +36,7 @@ def post(url, data):
     """Wrapper around requests.post with some simplification in our case"""
     url = BASE_ADDR + url
 
-    r = requests.post(url=url, data=data)
+    r = requests.post(url=url, json=data)
     r.raise_for_status()
     return r.json()
 
