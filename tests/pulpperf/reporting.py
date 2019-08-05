@@ -76,6 +76,7 @@ def fmt_start_end_date(label, start, end):
 
 
 def report_tasks_stats(workload, tasks):
+    print()
     print(workload)
     print("=" * len(workload))
     print(tasks_table(tasks))
