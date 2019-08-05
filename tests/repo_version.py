@@ -57,7 +57,6 @@ def main():
 
         results = pulpperf.interact.wait_for_tasks(tasks)
         pulpperf.reporting.report_tasks_stats('Version clone with base_version tasks', results)
-        add_content_units
 
         hrefs = [i['_href'] for i in list_units_in_repo_ver(r['repository_version_href'])]
         logging.debug("Repo version %s have %s units" % (r['repository_version_href'], len(hrefs)))
