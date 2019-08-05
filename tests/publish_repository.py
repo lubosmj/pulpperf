@@ -36,10 +36,7 @@ def main():
             tasks.append(task)
 
         results = pulpperf.interact.wait_for_tasks(tasks)
-        print(pulpperf.reporting.tasks_table(results))
-        print(pulpperf.reporting.tasks_min_max_table(results))
-        print("Publication tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))
-        print("Publication tasks service time:", pulpperf.reporting.tasks_service_time(results))
+        pulpperf.reporting.report_tasks_stats('Publication tasks', results)
 
         for i in range(len(results)):
             data[i]['publication_href'] = results[i]['created_resources'][0]
@@ -54,10 +51,7 @@ def main():
             tasks.append(task)
 
         results = pulpperf.interact.wait_for_tasks(tasks)
-        print(pulpperf.reporting.tasks_table(results))
-        print(pulpperf.reporting.tasks_min_max_table(results))
-        print("Distribution tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))
-        print("Distribution tasks service time:", pulpperf.reporting.tasks_service_time(results))
+        pulpperf.reporting.report_tasks_stats('Distribution tasks', results)
 
         for i in range(len(results)):
             data[i]['distribution_href'] = results[i]['created_resources'][0]

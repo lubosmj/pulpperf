@@ -60,3 +60,10 @@ def tasks_service_time(tasks):
 
 def fmt_start_end_date(label, start, end):
     return "%s: %s - %s" % (label, start.strftime(DATETIME_FMT), end.strftime(DATETIME_FMT))
+
+
+def report_tasks_stats(workload, tasks):
+    print(tasks_table(tasks))
+    print(tasks_min_max_table(tasks))
+    print("%s waiting time:" % workload, tasks_waiting_time(tasks))
+    print("%s service time:" % workload, tasks_service_time(tasks))

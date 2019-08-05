@@ -30,10 +30,7 @@ def main():
             tasks.append(task)
 
         results = pulpperf.interact.wait_for_tasks(tasks)
-        print(pulpperf.reporting.tasks_table(results))
-        print(pulpperf.reporting.tasks_min_max_table(results))
-        print("Resync tasks waiting time:", pulpperf.reporting.tasks_waiting_time(results))
-        print("Resync tasks service time:", pulpperf.reporting.tasks_service_time(results))
+        pulpperf.reporting.report_tasks_stats('Resync tasks', results)
 
     return 0
 
