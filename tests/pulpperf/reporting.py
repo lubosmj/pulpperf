@@ -38,6 +38,17 @@ def data_stats(data):
     }
 
 
+def fmt_data_stats(data):
+    # https://stackoverflow.com/questions/455612/limiting-floats-to-two-decimal-points
+    return {
+        'samples': data['samples'],
+        'min': float('%.02f' % round(data['min'], 2)),
+        'max': float('%.02f' % round(data['max'], 2)),
+        'mean': float('%.02f' % round(data['mean'], 2)),
+        'stdev': float('%.02f' % round(data['stdev'], 2)),
+    }
+
+
 def tasks_waiting_time(tasks):
     """Analyse tasks waiting time (i.e. started_at - _created)"""
     durations = []
@@ -45,7 +56,7 @@ def tasks_waiting_time(tasks):
         diff = datetime.datetime.strptime(t['started_at'], DATETIME_FMT) \
             - datetime.datetime.strptime(t['_created'], DATETIME_FMT)
         durations.append(diff.total_seconds())
-    return data_stats(durations)
+    return fmt_data_stats(data_stats(durations))
 
 
 def tasks_service_time(tasks):
@@ -55,7 +66,7 @@ def tasks_service_time(tasks):
         diff = datetime.datetime.strptime(t['finished_at'], DATETIME_FMT) \
             - datetime.datetime.strptime(t['started_at'], DATETIME_FMT)
         durations.append(diff.total_seconds())
-    return data_stats(durations)
+    return fmt_data_stats(data_stats(durations))
 
 
 def fmt_start_end_date(label, start, end):
