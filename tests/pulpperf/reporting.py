@@ -21,7 +21,7 @@ def tasks_min_max_table(tasks):
     for f in ('_created', 'started_at', 'finished_at'):
         sample = [datetime.datetime.strptime(t[f], DATETIME_FMT)
                   for t in tasks]
-        out += "%s\t%s\t%s\n" \
+        out += "%11s\t%s\t%s\n" \
             % (f,
                min(sample).strftime(DATETIME_FMT),
                max(sample).strftime(DATETIME_FMT))
@@ -74,6 +74,8 @@ def fmt_start_end_date(label, start, end):
 
 
 def report_tasks_stats(workload, tasks):
+    print(workload)
+    print("=" * len(workload))
     print(tasks_table(tasks))
     print(tasks_min_max_table(tasks))
     print("%s waiting time:" % workload, tasks_waiting_time(tasks))
