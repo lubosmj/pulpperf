@@ -21,10 +21,12 @@ def get(url, params={}):
 def get_results(url, params={}):
     """Wrapper around requests.get with some simplification in our case"""
     out = []
+    page = 0
     while True:
         data = get(url, params)
         out += data['results']
-        url = data['next']
+        page += 1
+        params['page'] = page
         if data['next'] is None:
             break
     return out
