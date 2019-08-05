@@ -19,6 +19,8 @@ def main():
     )
     parser.add_argument('--processes', type=int, default=1,
                         help='how many parallel processes to use when downloading')
+    parser.add_argument('--limit', type=int, default=100,
+                        help='how many files to download')
     with pulpperf.structure.status_data(parser) as (args, data):
 
         before = datetime.datetime.utcnow()
@@ -27,7 +29,7 @@ def main():
             params = []
             pulp_manifest = pulpperf.utils.parse_pulp_manifest(r['remote_url'] + 'PULP_MANIFEST')
             logging.debug("Pulp manifest for %s have %d files" % (r['remote_url'], len(pulp_manifest)))
-            for f, _, s in pulp_manifest:
+            for f, _, s in pulp_manifest[:args.limit]:
                 params.append((r['download_base_url'], f, s))
             logging.debug("Going to use %d processes to download files" % args.processes)
             with multiprocessing.Pool(processes=args.processes) as pool:
