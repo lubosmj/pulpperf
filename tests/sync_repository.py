@@ -41,6 +41,9 @@ def main():
             data.append({'remote_url': r})
 
         for r in data:
+            if r['remote_url'] not in args.repositories:
+                logging.warning("Skipping creation of %s as it is not in the args" % r['remote_url'])
+                continue
             r['repository_name'] = pulpperf.utils.get_random_string()
             r['repository_href'] = create_repo(r['repository_name'])
             logging.debug("Created repository %s" % r['repository_href'])
@@ -50,6 +53,9 @@ def main():
 
         tasks = []
         for r in data:
+            if r['remote_url'] not in args.repositories:
+                logging.warning("Skipping sync of %s as it is not in the args" % r['remote_url'])
+                continue
             task = start_sync(r['repository_href'], r['remote_href'])
             logging.debug("Created sync task %s" % task)
             tasks.append(task)
