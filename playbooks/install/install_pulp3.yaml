@@ -12,6 +12,7 @@
       git:
         repo: "https://github.com/pulp/ansible-pulp.git"
         dest: "{{ ansible_pulp_checkout }}"
+        force: yes
       delegate_to: localhost
       run_once: yes
 
