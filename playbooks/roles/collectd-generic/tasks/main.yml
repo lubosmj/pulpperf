@@ -6,7 +6,7 @@
 
 - name: "Install collectd rpms"
   yum:
-    name: "{{ collectd_packages.config_type }}"
+    name: "{{ collectd_packages[config_type] }}"
     state: present
 
 - name: "Uninstall EPEL"
