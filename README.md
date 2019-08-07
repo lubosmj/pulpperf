@@ -13,6 +13,10 @@ Create pulp file repository (100k files with 10B each):
 
     scripts/create_pulp_file_repo.py --files-count 100000 --file-size 10 --directory file-100k-10B/
 
+To be able to run tests, please create `~/.netrc` file:
+
+    https://pulp-file.readthedocs.io/en/latest/workflows/index.html
+
 Measure:
 
     cd tests/
