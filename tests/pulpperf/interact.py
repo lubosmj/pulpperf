@@ -53,19 +53,18 @@ def download(base_url, file_name, file_size):
         return duration
 
 
-def wait_for_tasks(tasks):
+def wait_for_tasks(tasks, timeout=None):
     """Wait for tasks to finish, returning task info. If we time out,
     list of None is returned."""
     start = time.time()
     out = []
-    timeout = 7200
     step = 3
     for t in tasks:
         while True:
-            now = time.time()
-            if now >= start + timeout:
-                out.append(None)
-                break
+            if timeout is not None:
+                now = time.time()
+                if now >= start + timeout:
+                    raise Exception("Task %s timeouted" % t)
             response = get(t)
             logging.debug("Task status is '%s', full response %s" % (response['state'], response))
             if response['state'] in ('failed', 'cancelled', 'completed'):
