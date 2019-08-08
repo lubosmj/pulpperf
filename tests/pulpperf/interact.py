@@ -1,3 +1,4 @@
+import logging
 import requests
 import tempfile
 import time
@@ -66,6 +67,7 @@ def wait_for_tasks(tasks):
                 out.append(None)
                 break
             response = get(t)
+            logging.debug("Task status is '%s', full response %s" % (response['state'], response))
             if response['state'] in ('failed', 'cancelled', 'completed'):
                 out.append(response)
                 break
